@@ -6,6 +6,9 @@ import {
   DeleteProductRequestParams,
   DeleteProductResponseBody,
   GetProductsResponseBody,
+  UpdateProductRequestBody,
+  UpdateProductRequestParams,
+  UpdateProductResponseBody,
 } from '../types/productsRoute.dt';
 import { isValidObjectId } from '../utils/isValidObjectId';
 
@@ -173,4 +176,124 @@ const deleteProduct = async (
   }
 };
 
-export { createProduct, deleteProduct, getProducts };
+const updateProduct = async (
+  req: Request<UpdateProductRequestParams, object, UpdateProductRequestBody>,
+  res: Response<UpdateProductResponseBody>,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    // check if the id is a valid mongodb object id
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({
+        error: 'Invalid product ID',
+        success: false,
+      });
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        error: 'Product not found',
+        success: false,
+      });
+    }
+
+    if (!req.body) {
+      return res.status(400).json({
+        error: 'at least one of name, image, or price is required',
+        success: false,
+      });
+    }
+
+    const { name: newName, price: newPrice, image: newImage } = req.body;
+
+    // validation
+    if (newName) {
+      if (typeof newName !== 'string') {
+        return res.status(400).json({
+          error: 'Name must be a string',
+          success: false,
+        });
+      }
+    }
+    if (newPrice) {
+      console.log('check point 1');
+      if (typeof newPrice !== 'number' || newPrice <= 0) {
+        return res.status(400).json({
+          error: 'Price must be a positive number',
+          success: false,
+        });
+      }
+    }
+
+    if (newImage) {
+      if (typeof newImage !== 'string') {
+        return res.status(400).json({
+          error: 'Image must be a string',
+          success: false,
+        });
+      }
+    }
+
+    const updatedProduct = await prisma.product.update({
+      where: {
+        id,
+      },
+      data: {
+        name: newName || product.name,
+        price: newPrice || product.price,
+        image: newImage || product.image,
+      },
+    });
+
+    res.status(200).json({
+      message: 'Product updated successfully',
+      product: updatedProduct,
+      success: true,
+    });
+  } catch (error: any) {
+    // Handle Prisma errors
+    if (error.code === 'P2025') {
+      return res.status(404).json({
+        error: 'Product not found',
+        success: false,
+      });
+    }
+
+    if (error.code === 'P2002') {
+      return res.status(409).json({
+        error: 'Product with this name already exists',
+        success: false,
+      });
+    }
+
+    if (error.code === 'P2003') {
+      return res.status(400).json({
+        error: 'Invalid data provided for update',
+        success: false,
+      });
+    }
+
+    if (error.code === 'P2014') {
+      return res.status(400).json({
+        error: 'Invalid database connection',
+        success: false,
+      });
+    }
+
+    // Log the error for debugging
+    console.error('Product update error:', error);
+
+    // Pass to global error handler
+    next(error);
+  }
+};
+
+export { createProduct, deleteProduct, getProducts, updateProduct };

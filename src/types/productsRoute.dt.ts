@@ -30,10 +30,30 @@ type DeleteProductResponseBody = {
   success?: boolean;
 };
 
+type UpdateProductRequestParams = {
+  id: string;
+};
+
+type UpdateProductRequestBody = {
+  name?: string;
+  price?: number;
+  image?: string;
+};
+
+type UpdateProductResponseBody = {
+  message?: string;
+  product?: Product;
+  error?: string;
+  success?: boolean;
+};
+
 export type {
   CreateProductRequestBody,
   CreateProductResponseBody,
   DeleteProductRequestParams,
   DeleteProductResponseBody,
   GetProductsResponseBody,
+  UpdateProductRequestBody,
+  UpdateProductRequestParams,
+  UpdateProductResponseBody,
 };
