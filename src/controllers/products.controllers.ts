@@ -5,8 +5,49 @@ import {
   CreateProductResponseBody,
   DeleteProductRequestParams,
   DeleteProductResponseBody,
+  GetProductsResponseBody,
 } from '../types/productsRoute.dt';
 import { isValidObjectId } from '../utils/isValidObjectId';
+
+const getProducts = async (req: Request, res: Response<GetProductsResponseBody>, next: NextFunction) => {
+  try {
+    const products = await prisma.product.findMany();
+
+    res.status(200).json({
+      message: 'Products fetched successfully',
+      products,
+      success: true,
+    });
+  } catch (error: any) {
+    // Handle Prisma errors
+    if (error.code === 'P2003') {
+      return res.status(400).json({
+        error: 'Database constraint violation',
+        success: false,
+      });
+    }
+
+    if (error.code === 'P2014') {
+      return res.status(400).json({
+        error: 'Invalid database connection',
+        success: false,
+      });
+    }
+
+    if (error.code === 'P2024') {
+      return res.status(500).json({
+        error: 'Database timeout',
+        success: false,
+      });
+    }
+
+    // Log the error for debugging
+    console.error('Products fetch error:', error);
+
+    // Pass to global error handler
+    next(error);
+  }
+};
 
 const createProduct = async (
   req: Request<object, object, CreateProductRequestBody>,
@@ -132,4 +173,4 @@ const deleteProduct = async (
   }
 };
 
-export { createProduct, deleteProduct };
+export { createProduct, deleteProduct, getProducts };

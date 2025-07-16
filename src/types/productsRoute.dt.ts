@@ -1,5 +1,12 @@
 import { Product } from '../generated/prisma';
 
+type GetProductsResponseBody = {
+  message?: string;
+  products?: Product[];
+  error?: string;
+  success?: boolean;
+};
+
 type CreateProductRequestBody = {
   name: string;
   price: number;
@@ -23,4 +30,10 @@ type DeleteProductResponseBody = {
   success?: boolean;
 };
 
-export type { CreateProductRequestBody, CreateProductResponseBody, DeleteProductRequestParams, DeleteProductResponseBody };
+export type {
+  CreateProductRequestBody,
+  CreateProductResponseBody,
+  DeleteProductRequestParams,
+  DeleteProductResponseBody,
+  GetProductsResponseBody,
+};
