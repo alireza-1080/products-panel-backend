@@ -13,4 +13,14 @@ type CreateProductResponseBody = {
   success?: boolean;
 };
 
-export type { CreateProductRequestBody, CreateProductResponseBody };
+type DeleteProductRequestParams = {
+  id: string;
+};
+
+type DeleteProductResponseBody = {
+  message?: string;
+  error?: string;
+  success?: boolean;
+};
+
+export type { CreateProductRequestBody, CreateProductResponseBody, DeleteProductRequestParams, DeleteProductResponseBody };
