@@ -224,7 +224,6 @@ const updateProduct = async (
       }
     }
     if (newPrice) {
-      console.log('check point 1');
       if (typeof newPrice !== 'number' || newPrice <= 0) {
         return res.status(400).json({
           error: 'Price must be a positive number',
