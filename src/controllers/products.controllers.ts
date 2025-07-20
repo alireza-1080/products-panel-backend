@@ -14,7 +14,11 @@ import { isValidObjectId } from '../utils/isValidObjectId';
 
 const getProducts = async (req: Request, res: Response<GetProductsResponseBody>, next: NextFunction) => {
   try {
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     res.status(200).json({
       message: 'Products fetched successfully',
