@@ -11,6 +11,7 @@ import {
   UpdateProductResponseBody,
 } from '../types/productsRoute.dt';
 import { isValidObjectId } from '../utils/isValidObjectId';
+import { PrismaError } from '../types/errors';
 
 const getProducts = async (req: Request, res: Response<GetProductsResponseBody>, next: NextFunction) => {
   try {
@@ -25,23 +26,24 @@ const getProducts = async (req: Request, res: Response<GetProductsResponseBody>,
       products,
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as PrismaError;
     // Handle Prisma errors
-    if (error.code === 'P2003') {
+    if (prismaError.code === 'P2003') {
       return res.status(400).json({
         error: 'Database constraint violation',
         success: false,
       });
     }
 
-    if (error.code === 'P2014') {
+    if (prismaError.code === 'P2014') {
       return res.status(400).json({
         error: 'Invalid database connection',
         success: false,
       });
     }
 
-    if (error.code === 'P2024') {
+    if (prismaError.code === 'P2024') {
       return res.status(500).json({
         error: 'Database timeout',
         success: false,
@@ -49,10 +51,11 @@ const getProducts = async (req: Request, res: Response<GetProductsResponseBody>,
     }
 
     // Log the error for debugging
-    console.error('Products fetch error:', error);
+    //eslint-disable-next-line no-console
+    console.error('Products fetch error:', prismaError);
 
     // Pass to global error handler
-    next(error);
+    next(prismaError);
   }
 };
 
@@ -106,16 +109,17 @@ const createProduct = async (
       product,
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as PrismaError;
     // Handle Prisma errors
-    if (error.code === 'P2002') {
+    if (prismaError.code === 'P2002') {
       return res.status(409).json({
         error: 'Product with this name already exists',
         success: false,
       });
     }
 
-    if (error.code === 'P2003') {
+    if (prismaError.code === 'P2003') {
       return res.status(400).json({
         error: 'Invalid data provided',
         success: false,
@@ -123,10 +127,11 @@ const createProduct = async (
     }
 
     // Log the error for debugging
-    console.error('Product creation error:', error);
+    //eslint-disable-next-line no-console
+    console.error('Product creation error:', prismaError);
 
     // Pass to global error handler
-    next(error);
+    next(prismaError);
   }
 };
 
@@ -146,7 +151,7 @@ const deleteProduct = async (
       });
     }
 
-    const product = await prisma.product.delete({
+    await prisma.product.delete({
       where: {
         id,
       },
@@ -156,16 +161,17 @@ const deleteProduct = async (
       message: 'Product deleted successfully',
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as PrismaError;
     // Handle Prisma errors
-    if (error.code === 'P2025') {
+    if (prismaError.code === 'P2025') {
       return res.status(404).json({
         error: 'Product not found',
         success: false,
       });
     }
 
-    if (error.code === 'P2003') {
+    if (prismaError.code === 'P2003') {
       return res.status(400).json({
         error: 'Cannot delete product due to existing references',
         success: false,
@@ -173,10 +179,11 @@ const deleteProduct = async (
     }
 
     // Log the error for debugging
-    console.error('Product deletion error:', error);
+    //eslint-disable-next-line no-console
+    console.error('Product deletion error:', prismaError);
 
     // Pass to global error handler
-    next(error);
+    next(prismaError);
   }
 };
 
@@ -261,30 +268,31 @@ const updateProduct = async (
       product: updatedProduct,
       success: true,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const prismaError = error as PrismaError;
     // Handle Prisma errors
-    if (error.code === 'P2025') {
+    if (prismaError.code === 'P2025') {
       return res.status(404).json({
         error: 'Product not found',
         success: false,
       });
     }
 
-    if (error.code === 'P2002') {
+    if (prismaError.code === 'P2002') {
       return res.status(409).json({
         error: 'Product with this name already exists',
         success: false,
       });
     }
 
-    if (error.code === 'P2003') {
+    if (prismaError.code === 'P2003') {
       return res.status(400).json({
         error: 'Invalid data provided for update',
         success: false,
       });
     }
 
-    if (error.code === 'P2014') {
+    if (prismaError.code === 'P2014') {
       return res.status(400).json({
         error: 'Invalid database connection',
         success: false,
@@ -292,10 +300,11 @@ const updateProduct = async (
     }
 
     // Log the error for debugging
-    console.error('Product update error:', error);
+    //eslint-disable-next-line no-console
+    console.error('Product update error:', prismaError);
 
     // Pass to global error handler
-    next(error);
+    next(prismaError);
   }
 };
 

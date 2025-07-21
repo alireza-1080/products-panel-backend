@@ -1,0 +1,43 @@
+{
+  "env": {
+    "es2022": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "@typescript-eslint/recommended", "prettier"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    "no-console": "warn",
+    "@typescript-eslint/no-explicit-any": "warn"
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "*.js",
+    "*.mjs",
+    "*.cjs",
+    "*.json",
+    "*.md",
+    "*.txt",
+    "*.log",
+    "*.lock",
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    ".git/**",
+    ".vscode/**",
+    ".idea/**",
+    "*.min.js",
+    "*.bundle.js",
+    "prisma/migrations/**",
+    "src/generated/**",
+    ".env*",
+    ".sample.env"
+  ]
+}
